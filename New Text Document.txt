@@ -1,0 +1,46 @@
+router.post('/login',[
+  body('email').isEmail(),
+  body('password').isLength({ min: 5 })
+],(req,res)=>{
+  const errors = validationResult(req);
+   if (!errors.isEmpty()) {
+     return res.status(400).json({ errors: errors.array()});
+   }
+  User.create({
+    email: req.body.email,
+    password:req.body.password
+  }) 
+})
+
+
+router.post('/signup',[
+   body('name').isLength({ min: 3 }), 
+   body('email').isEmail(),
+   body('password').isLength({ min: 5 }),
+   body('phone_no').isLength({ min: 10, max:11 }),
+   body('profession').isLength({ min: 3 }),
+   body('address').isLength({ min: 3 }),
+   body('aadharNum').isLength({ min: 12, max:12 }),
+   body('panNum').isLength({ min: 10, max:10 })
+],
+async(req,res)=>{
+   const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    let user=User.findOne({email:body.req.email})
+    if(user){
+      return res.status(400).json({ errors: "Email already exists" });
+    }
+    user=await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password:req.body.password,
+      phone_no:req.body.phone_no,
+      profession:req.body.profession,
+      age:req.body.age,
+      address:req.body.address,
+      gender:req.body.gender,
+      aadharNum:req.body.aadharNum,
+    }).then(user => res.json(user));
+})
